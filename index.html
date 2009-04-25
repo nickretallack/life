@@ -1,11 +1,13 @@
+<!doctype html>
 <html>
 <head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <title>Life Game</title>
 <script type="text/javascript" src="jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="util.js"></script>
 <script type="text/javascript" src="life.js"></script>
 <script type="text/javascript" src="draw.js"></script>
-<style>
+<style type="text/css">
 #board {padding:0;margin:0;}
 #board td {width:20px; height:20px; background-color:red; padding:0; margin:0;}
 #board td.dead {background-color:gray;}
@@ -15,18 +17,19 @@ textarea {display:block; width:90%;}
 
 <body>
 <table id="board"></table>
-<form action="life.html">
+<form action="index.html">
 <label for="width">Width:</label><input type="text" name="width" id="width" value="40"/>
 <label for="height">Height:</label><input type="text" name="height" id="height" value="20">
 <input type="submit" value="Set"/>  
 </form>
-<button id="step-button">Step ></button>
-<button id="go-button">Play >></button>
-<button id="stop-button">Stop []</button>
+<button id="step-button">Step &rsaquo;</button>
+<button id="go-button">Play &raquo;</button>
+<button id="stop-button">Stop &bull;</button>
 <button id="export-button">Export</button>
 <p class="setups">Examples: 
 <a href="#blinker">Blinker</a> |
 <a href="#glider">Glider</a> |
 <a href="#flower">Flower</a></p>
+<p>Click and drag around on the grid to edit it yourself.</p>
 </body>
 </html>

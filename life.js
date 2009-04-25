@@ -82,6 +82,7 @@ function make_board(size)
 function setup_board(board, life, size){
   clearTimeout(timer)
   var board = make_board(size)
+  life_forms = {}
   
   $(life).each(function(){
     set_board(board, this, alive)

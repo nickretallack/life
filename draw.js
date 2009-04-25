@@ -29,7 +29,7 @@ function update_board_view(board, board_node, volatile_cells){
     node.removeClass('dead').removeClass('alive')
     if(get_point(board, point) != dead) node.addClass('alive')
     else node.addClass('dead')
-	}
+  }
 }
 
 function step_and_view(){
@@ -74,25 +74,27 @@ function Setup(){
   // Make and Display the board
   current_board = setup_board(current_board, life, size)
   init_board_view(current_board, current_board_view)
-	update_board_view(current_board, current_board_view, find_volatile_cells(current_board));
+  update_board_view(current_board, current_board_view, find_volatile_cells(current_board));
 
   $('#width').val(size[0])
   $('#height').val(size[1])
 
   // Wire up the event handlers
-	$('#go-button').click(Play)
-	$('#stop-button').click(Stop)
-	$('#step-button').click(Step)
-	$('#export-button').click(Export)
-	
-	$(".setups a").click(function(){
-	  var kind = $(this).attr('href').split('#')[1]
-    current_board = setup_board(current_board, kind, board_size(current_board))
-  	update_board_view(current_board, current_board_view, find_volatile_cells(current_board));
-	})
-	
-	// drawing controls
-	var cells = $(current_board).find('td')
+  $('#go-button').click(Play)
+  $('#stop-button').click(Stop)
+  $('#step-button').click(Step)
+  $('#export-button').click(Export)
+  
+  $(".setups a").click(function(){
+    var kind = $(this).attr('href').split('#')[1]
+    var old_board = current_board
+    $('#board .alive').removeClass('alive').addClass('dead')
+    current_board = setup_board(current_board, setups[kind], board_size(current_board))
+    update_board_view(current_board, current_board_view, find_volatile_cells(current_board));
+  })
+  
+  // drawing controls
+  var cells = $(current_board).find('td')
   cells.live('mousedown', function(e){
     e.preventDefault()
     drawing = true
