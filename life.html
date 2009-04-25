@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Life Game</title>
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="life.js"></script>
+<style>
+#board {padding:0;margin:0;}
+#board td {width:20px; height:20px; background-color:red; padding:0; margin:0;}
+#board td.dead {background-color:gray;}
+textarea {display:block; width:90%;}
+</style>
+</head>
+
+<body>
+<table id="board"></table>
+<form action="life.html">
+<label for="width">Width:</label><input type="text" name="width" id="width" value="40"/>
+<label for="height">Height:</label><input type="text" name="height" id="height" value="20">
+<input type="submit" value="Set"/>  
+</form>
+<p class="setups">
+<a href="#blinker">Blinker</a> |
+<a href="#glider">Glider</a> |
+<a href="#flower">Flower</a></p>
+<button id="step-button">Step ></button>
+<button id="go-button">Play >></button>
+<button id="stop-button">Stop []</button>
+<button id="export-button">Export</button>
+</body>
+</html>
