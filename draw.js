@@ -15,7 +15,8 @@ function init_board_view(board, board_node){
   for(var y=0; y < y_size(board); y++){
     var row = $(document.createElement('tr'))
     for(var x=0; x < x_size(board); x++){
-      var element = $(document.createElement('td')).attr('data-position',x+','+y).addClass('dead').text(' ')
+      var element = $(document.createElement('td')).addClass(x+'-'+y).addClass('dead').text(' ')
+      element.attr('data-position',x+','+y)
       row.append(element)
     }
     board_node.append(row)
@@ -25,10 +26,11 @@ function init_board_view(board, board_node){
 function update_board_view(board, board_node, volatile_cells){
   for (var point in volatile_cells){
     point = unhash_point(point)
-    var node = $('[data-position='+point[0]+','+point[1]+']')
-    node.removeClass('dead').removeClass('alive')
-    if(get_point(board, point) != dead) node.addClass('alive')
-    else node.addClass('dead')
+    var node = $('.'+point[0]+'-'+point[1])
+    //node.removeClass('dead').removeClass('alive')
+    if(get_point(board, point) == dead) node.addClass('dead')
+    else node.removeClass('dead') //node.addClass('alive')
+    //else node.addClass('dead')
   }
 }
 
@@ -88,7 +90,7 @@ function Setup(){
   $(".setups a").click(function(){
     var kind = $(this).attr('href').split('#')[1]
     var old_board = current_board
-    $('#board .alive').removeClass('alive').addClass('dead')
+    $('#board td').addClass('dead')
     current_board = setup_board(current_board, setups[kind], board_size(current_board))
     update_board_view(current_board, current_board_view, find_volatile_cells(current_board));
   })
