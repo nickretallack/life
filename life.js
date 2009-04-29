@@ -18,14 +18,26 @@ function set_board(board, point, value){
   return value
 }
 
+function mod(val, wrap){
+  val = val % wrap
+  while(val < 0) val += wrap
+  return val
+}
+
+function point_mod_bounds(point, board){
+  return [mod(point[0], x_size(board)), mod(point[1], y_size(board))]
+}
+
 function count_neighbors(board, point){
-	var neighbors = 0
-	$(offsets).each(function(){
-	  var this_point = point_plus(point, this)
-	  if (check_bounds(this_point, board) && get_point(board, this_point) != dead)
-	    neighbors++
-	})
-	return neighbors;
+  var neighbors = 0
+  $(offsets).each(function(){
+    var this_point = point_plus(point, this)
+    var wrapped_point = point_mod_bounds(this_point, board)
+    //console.debug(wrapped_point)
+    if (get_point(board, wrapped_point) != dead)
+      neighbors++
+  })
+  return neighbors;
 }
 
 function find_volatile_cells(board){
@@ -38,18 +50,23 @@ function find_volatile_cells(board){
     $(offsets).each(function(){
       var offset = this
       var point = point_plus(life_form, offset)
-      if(check_bounds(point,board)) cells[point] = true
+      var wrapped_point = point_mod_bounds(point, board)
+      cells[wrapped_point] = true
     })
   }
   return cells
 }
 
+var all_cells_cached = null
+
 // An alternative for find_volatile_cells to compare behavior and performance
 function all_cells(board){
+  if (all_cells_cached) return all_cells_cached
   cells = {}
   for(var x = 0; x < x_size(board); ++x)
    for(var y = 0; y < y_size(board); ++y)
      cells[[x,y]] = true
+  all_cells_cached = cells
   return cells  
 }
 
@@ -63,20 +80,20 @@ function next_step(old_board, volatile_cells){
     neighbors = count_neighbors(old_board, point)
     if(neighbors == 3) set_board(new_board, point, crowded)
     if(neighbors == 2 && get_point(old_board, point) != dead) set_board(new_board, point, lonely)
-	}
-	return new_board
+  }
+  return new_board
 }
 
 function make_board(size)
 {
-	var board = new Array(size[0]);
-	for(var x = 0; x < size[0]; ++x){
-		board[x] = new Array(size[1]);
-		for(var y = 0; y < size[1]; ++y){
-			set_board(board, [x,y], dead)		  
-		}
-	}
-	return board
+  var board = new Array(size[0]);
+  for(var x = 0; x < size[0]; ++x){
+    board[x] = new Array(size[1]);
+    for(var y = 0; y < size[1]; ++y){
+      set_board(board, [x,y], dead)     
+    }
+  }
+  return board
 }
 
 function setup_board(board, life, size){

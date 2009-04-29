@@ -24,18 +24,18 @@ function unhash_point(str){
 
 // adds querystring parsing to jquery.  Found at jQuery google group
 jQuery.query = function(s) { 
-     if (s.indexOf('?') == -1) return {}
-     var r = {}; 
-     var q = s.substring(s.indexOf('?') + 1); 
-     q = q.replace(/\&$/, ''); // remove the trailing & 
-     jQuery.each(q.split('&'), function() { 
-         var splitted = this.split('='); 
-         var key = splitted[0]; 
-         var val = splitted[1]; 
-         // convert floats 
-         if (/^[0-9.]+$/.test(val)) val = parseFloat(val); 
-         // ignore empty values 
-         if (typeof val == 'number' || val.length > 0) r[key] = val; 
-     }); 
-     return r; 
+  if (s.indexOf('?') == -1) return {}
+  var r = {}; 
+  var q = s.substring(s.indexOf('?') + 1); 
+  q = q.replace(/\&$/, ''); // remove the trailing & 
+  jQuery.each(q.split('&'), function() { 
+    var splitted = this.split('='); 
+    var key = splitted[0]; 
+    var val = splitted[1]; 
+    // convert floats 
+    if (/^[0-9.]+$/.test(val)) val = parseFloat(val); 
+    // ignore empty values 
+    if (typeof val == 'number' || val.length > 0) r[key] = val; 
+  }); 
+  return r; 
 }; 

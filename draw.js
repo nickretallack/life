@@ -35,7 +35,7 @@ function update_board_view(board, board_node, volatile_cells){
 }
 
 function step_and_view(){
-  var volatile_cells = find_volatile_cells(current_board)
+  var volatile_cells = find_volatile_cells(current_board) //find_volatile_cells(current_board)
   current_board = next_step(current_board, volatile_cells)
   update_board_view(current_board, current_board_view, volatile_cells)
 }
@@ -119,9 +119,18 @@ function Setup(){
 }
 
 function Play(){
-  step_and_view()
-  timer = setTimeout(Play,200)
+  if (timer) Stop()
+  else {
+    $("#go-button").text("Pause")
+    playing()
+  }
 }
+
+function playing(){
+  step_and_view()
+  timer = setTimeout(playing,200)
+}
+
 
 function Step(){
   Stop()
@@ -129,6 +138,7 @@ function Step(){
 }
 
 function Stop(){
+  $("#go-button").text("Play")
   clearTimeout(timer)
   timer = null
 }
