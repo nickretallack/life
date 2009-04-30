@@ -1,108 +1,81 @@
+var alive = 1
+var dead
+
 /* This file is for the brains.  It doesn't touch the dom, and tries to stay stateless. */
-
-var life_forms = {} // This is the only stateful thing in this file.  It should be part of Board.
-var timer = null
-
-var dead = 0;
-var alive = 1;
-var lonely = 2;
-var crowded = 3;
-
-var offsets = [[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1],[0,1],[1,1]]
-
-// Lets keep track of our life forms so we know what we need to update
-function set_board(board, point, value){
-  if(value) life_forms[point] = true    
-  else delete life_forms[point]
-  set_point(board, point, value)
-  return value
-}
-
-function mod(val, wrap){
-  val = val % wrap
-  while(val < 0) val += wrap
-  return val
-}
-
-function point_mod_bounds(point, board){
-  return [mod(point[0], x_size(board)), mod(point[1], y_size(board))]
-}
-
-function count_neighbors(board, point){
-  var neighbors = 0
-  $(offsets).each(function(){
-    var this_point = point_plus(point, this)
-    var wrapped_point = point_mod_bounds(this_point, board)
-    //console.debug(wrapped_point)
-    if (get_point(board, wrapped_point) != dead)
-      neighbors++
-  })
-  return neighbors;
-}
-
-function find_volatile_cells(board){
-  // Only life forms and their neighbors will need to be updated
-  // Here we compile a list of all affected tiles
-  var cells = {}
-  for(var life_form in life_forms){
-    life_form = unhash_point(life_form)
-    cells[life_form] = true
-    $(offsets).each(function(){
-      var offset = this
-      var point = point_plus(life_form, offset)
-      var wrapped_point = point_mod_bounds(point, board)
-      cells[wrapped_point] = true
-    })
-  }
-  return cells
-}
-
-var all_cells_cached = null
-
-// An alternative for find_volatile_cells to compare behavior and performance
-function all_cells(board){
-  if (all_cells_cached) return all_cells_cached
-  cells = {}
-  for(var x = 0; x < x_size(board); ++x)
-   for(var y = 0; y < y_size(board); ++y)
-     cells[[x,y]] = true
-  all_cells_cached = cells
-  return cells  
-}
-
-function next_step(old_board, volatile_cells){
-  var new_board = make_board(board_size(old_board))
-  // Clear off the old data and make a new board state referencing the old one.
-  // TODO: model corpses where there was life last round
-  life_forms = {}
-  for (var point in volatile_cells){
-    point = unhash_point(point)
-    neighbors = count_neighbors(old_board, point)
-    if(neighbors == 3) set_board(new_board, point, crowded)
-    if(neighbors == 2 && get_point(old_board, point) != dead) set_board(new_board, point, lonely)
-  }
-  return new_board
-}
-
-function make_board(size)
-{
-  var board = new Array(size[0]);
-  for(var x = 0; x < size[0]; ++x){
-    board[x] = new Array(size[1]);
-    for(var y = 0; y < size[1]; ++y){
-      set_board(board, [x,y], dead)     
-    }
-  }
-  return board
-}
-
-function setup_board(board, life, size){
-  clearTimeout(timer)
-  var board = make_board(size)
-  life_forms = {}
+/* OMG, lets refactor this to only use a hash, no 2D array at all! */
+function Life(width, height, life){
+  // constants
+  var offsets = [[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1],[0,1],[1,1]]
+  var rotten = -1
+  // var dead = 0
+  // var lonely = 2
+  // var crowded = 3
   
-  $(life).each(function(){
-    set_board(board, this, alive)
-  })
-  return board
+  var self = this
+
+  // parameter defaults
+  if (!life) life = {}
+  if (!width) width = 40
+  if (!height) height = 20
+
+  // public
+  self.life = life
+  self.width = width
+  self.height = height
+  self.dirty_cells = life // has to draw initial life
+  
+  function count_neighbors(cell){
+    var neighbors = 0
+    $(offsets).each(function(){
+      var wrapped_point = point_mod_boundary (point_plus(cell, this), [width, height])
+      if (self.life[wrapped_point] == alive)
+        neighbors++
+    })
+    return neighbors;
+  }
+
+  self.step = function(){
+    var new_life = {}
+    var visited_cells = {}
+    self.dirty_cells = {}
+
+    function visit(cell){
+      // optimization so we don't visit the same cell twice
+      if (visited_cells[cell]) return
+      visited_cells[cell] = true
+      
+      // calculate new life
+      var neighbors = count_neighbors(cell)
+      if(neighbors == 3)
+        new_life[cell] = alive
+      if(neighbors == 2 && self.life[cell] == alive)
+        new_life[cell] = alive
+      
+      // optimization so the draw phase changes as little as possible
+      if (new_life[cell] != self.life[cell])
+        self.dirty_cells[cell] = true
+    }
+
+    // visit all current life and its neighbors
+    for (var cell in self.life){
+      cell = unhash_point(cell)
+      visit(cell)
+      $(offsets).each(function(){
+        var neighbor_cell = point_mod_boundary (point_plus(cell, this), [width, height])
+        visit(neighbor_cell)
+      })
+    }
+    
+    // throw away old state
+    self.life = new_life
+  }
+  
+  self.set_life = function(life){
+    self.life = self.dirty_cells = life
+  }
+  
+  self.set_cell = function(cell, value){
+    self.dirty_cells[cell] = true
+    self.life[cell] = value
+  }
 }

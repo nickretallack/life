@@ -13,6 +13,37 @@ function check_bounds(point, board){
   return point[0] >= 0 && point[1] >= 0 && point[0] < x_size(board) && point[1] < y_size(board)
 }
 
+function mod(val, wrap){
+  val = val % wrap
+  while(val < 0) val += wrap
+  return val
+}
+
+function point_mod_bounds(point, board){
+  return [mod(point[0], x_size(board)), mod(point[1], y_size(board))]
+}
+
+function point_mod_boundary(point, bounds){
+  return [mod(point[0], bounds[0]), mod(point[1], bounds[1])]
+}
+
+function list_to_set(list){
+  var set = {}
+  $(list).each(function(){
+    set[this] = true
+  })
+  return set
+}
+
+function set_to_list(set){
+  var list = []
+  for (var item in set){
+    list.push(item)
+  }
+  return list
+}
+
+
 function unhash_point(str){
   var ints = str.split(',')
   var point = []
